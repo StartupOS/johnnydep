@@ -11,6 +11,7 @@ from johnnydep.compat import dict
 from johnnydep.lib import JohnnyDist, has_error
 from johnnydep.logs import configure_logging
 from johnnydep.util import python_interpreter
+from johnnydep.requirementstxt import parseFile
 
 
 FIELDS = dict(
@@ -76,17 +77,29 @@ def main():
         action="version",
         version="%(prog)s v{}".format(johnnydep.__version__),
     )
+    parser.add_argument(
+        "--requirements",
+        type=str
+    )
     args = parser.parse_args()
+
     if "ALL" in args.fields:
         args.fields = list(FIELDS)
-    configure_logging(verbosity=args.verbose)
-    dist = JohnnyDist(
-        args.req,
-        index_url=args.index_url,
-        env=args.env,
-        extra_index_url=args.extra_index_url,
-        ignore_errors=args.ignore_errors,
-    )
-    print(dist.serialise(fields=args.fields, format=args.output_format, recurse=args.recurse))
-    if (args.recurse and has_error(dist)) or (not args.recurse and dist.error is not None):
-        sys.exit(1)
+    
+    if args.requirements:
+        print(args.requirements)
+        parseFile(args.requirements)
+        sys.exit(0)
+    
+    else:
+        configure_logging(verbosity=args.verbose)
+        dist = JohnnyDist(
+            args.req,
+            index_url=args.index_url,
+            env=args.env,
+            extra_index_url=args.extra_index_url,
+            ignore_errors=args.ignore_errors,
+        )
+        print(dist.serialise(fields=args.fields, format=args.output_format, recurse=args.recurse))
+        if (args.recurse and has_error(dist)) or (not args.recurse and dist.error is not None):
+            sys.exit(1)
