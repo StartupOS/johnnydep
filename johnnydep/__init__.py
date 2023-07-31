@@ -2,4 +2,4 @@
 
 __version__ = "1.14"
 
-from johnnydep.lib import *
+from lib import *
