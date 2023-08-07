@@ -23,9 +23,9 @@ from packaging.utils import canonicalize_version
 from structlog import get_logger
 from wimpy import cached_property
 
-from johnnydep import pipper
-from johnnydep.compat import dict
-from johnnydep.compat import oyaml
+import pipper
+from compat import dict
+from compat import oyaml
 
 __all__ = ["JohnnyDist", "gen_table", "flatten_deps", "has_error"]
 

@@ -6,13 +6,13 @@ import os
 import sys
 from argparse import ArgumentParser
 
-import johnnydep
-from johnnydep.compat import dict
-from johnnydep.lib import JohnnyDist, has_error
-from johnnydep.logs import configure_logging
-from johnnydep.util import python_interpreter
-from johnnydep.requirementstxt import parseFile
 
+from compat import dict
+from lib import JohnnyDist, has_error
+from logs import configure_logging
+from util import python_interpreter
+from requirementstxt import parseFile
+from walk import node_license_walk
 
 FIELDS = dict(
     [
@@ -40,8 +40,8 @@ FIELDS = dict(
 
 def main():
     default_fields = os.environ.get("JOHNNYDEP_FIELDS", "name,summary").split(",")
-    parser = ArgumentParser(prog="johnnydep", description=johnnydep.__doc__)
-    parser.add_argument("req", help="The project name or requirement specifier")
+    parser = ArgumentParser(prog="johnnydep", description=__doc__)
+    # parser.add_argument("req", help="The project name or requirement specifier")
     parser.add_argument("--index-url", "-i")
     parser.add_argument("--extra-index-url")
     parser.add_argument(
@@ -72,27 +72,43 @@ def main():
     )
     parser.add_argument("--for-python", "-p", dest="env", type=python_interpreter)
     parser.add_argument("--verbose", "-v", default=1, type=int, choices=range(3))
+    # parser.add_argument(
+    #     "--version",
+    #     action="version",
+    #     version="%(prog)s v{}".format(__version__),
+    # )
     parser.add_argument(
-        "--version",
-        action="version",
-        version="%(prog)s v{}".format(johnnydep.__version__),
+        "--requirements", "-r", 
+        dest="requirements",
+        nargs="*",
+        type=str
     )
     parser.add_argument(
-        "--requirements",
+        "--walk", "-w", 
+        dest="walk",
+        nargs=1,
+        type=str
+    )
+    parser.add_argument(
+        "--node-license-walk", "-n", 
+        dest="node_license_walk",
+        nargs=1,
         type=str
     )
     args = parser.parse_args()
 
     if "ALL" in args.fields:
         args.fields = list(FIELDS)
-    
-    if args.requirements:
-        print(args.requirements)
-        parseFile(args.requirements)
+    configure_logging(verbosity=args.verbose)
+    if args.node_license_walk:
+        node_license_walk(path=args.node_license_walk[0])
+    elif args.walk:
+        pass
+    elif args.requirements:
+        parseFile(args, filename=args.requirements[0])
         sys.exit(0)
     
     else:
-        configure_logging(verbosity=args.verbose)
         dist = JohnnyDist(
             args.req,
             index_url=args.index_url,

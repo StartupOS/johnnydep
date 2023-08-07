@@ -3,8 +3,8 @@ from argparse import ArgumentTypeError
 from subprocess import check_output
 from subprocess import CalledProcessError
 
-from johnnydep import env_check
-from johnnydep.compat import JSONDecodeError
+import env_check
+from compat import JSONDecodeError
 
 
 def python_interpreter(path):

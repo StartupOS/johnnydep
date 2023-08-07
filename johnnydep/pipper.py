@@ -21,9 +21,9 @@ from cachetools.keys import hashkey
 from cachetools import TTLCache
 from structlog import get_logger
 
-from johnnydep.compat import urlparse, urlretrieve, dict
-from johnnydep.logs import configure_logging
-from johnnydep.util import python_interpreter
+from compat import urlparse, urlretrieve, dict
+from logs import configure_logging
+from util import python_interpreter
 
 log = get_logger(__name__)
 
