@@ -1,57 +1,9 @@
-from curses.ascii import isdigit
-import json
-import os
-from pathlib import Path
-from typing import List, TextIO
-import xml
+from johnnydep.walkers.classes import Walker, Entry
+from typing import TextIO
+import xml.etree.ElementTree as ET
 
-class Entry(dict):
-    def __init__(self,
-        name:str,
-        source:str,
-        specifier:str,
-        license,
-        requires,
-        required_by,
-        summary:str
-    )->None:
-        if not name:
-            raise Exception("Entries must have a package name")
-        if not source:
-            raise Exception("Entries must have a package source")
-        
-        self.name=name
-        self.source=source
-        self.specifier=specifier
-        self.license=license
-        self.requires=requires
-        self.required_by=required_by
-        self.summary=summary
+# TODO implement defusedxml
 
-class Walker():
-    def __init__(self, 
-        manifest_type:str, #"json", 
-        manifest_files:List[str] #["package.json"]
-        ) -> None:
-        self.files=[]
-        self.manifest_files=manifest_files
-        self.manifest_type=manifest_type
-        self.entries = []
-
-    def walk(self, path:str="./", parse:bool=True, expand:bool=False):
-        for pattern in self.manifest_files:
-            glob =  "**/" + pattern
-            for p in Path(path).rglob(glob):
-                self.files.append(p)
-                if parse:
-                    self.parse(file=p, expand=expand)
-        
-    def parse(self, file, expand=False):
-        raise Exception("No parser for this Walker")
-
-    def expand(self, file):
-        raise Exception("No expansion for this Walker")
-    
 class MavenWalker(Walker):
     # pkg:maven/springframework/spring@1.2.6
     # mvn license:aggregate-add-third-party
@@ -80,10 +32,17 @@ class MavenWalker(Walker):
     # </project>
 
     def parse(self, file:TextIO, expand=False):
-        parser = xml.parsers.expat.ParserCreate()
-        parser.ParseFile(file)
-        parser.
-        raise Exception("No parser for this Walker")
+        tree = ET.parse(file)
+        # root = tree.getroot()
+        dependencies = tree.findall('dependencies/dependency')
+        for d in dependencies:
+            n=d["groupId"]+ "/" + d["artifactId"]
+            e = Entry(
+                name=n, 
+                source='maven', 
+                specifier="=="+d["version"]
+            )
+            self.entries.append(e)
 
     def expand(self, file):
         raise Exception("No expansion for this Walker")

@@ -7,3 +7,4 @@ pytest-socket
 coverage
 whl >= 0.0.3
 wimpy == 0.3  # just something we can pin
+httpx

@@ -4,15 +4,16 @@ import os
 from pathlib import Path
 
 from requirementstxt import parseFile
+from johnnydep.walkers.maven import mavenWalker
+from johnnydep.walkers.npm import nodeWalker
+from johnnydep.walkers.classes import Entry
+
+
 
 # should probably move this to a conf
 # Manifests we support
 python_matches = ["requirements.txt", "requirements-dev.txt"]
 node_matches = ["package.json"]
-
-# TODO: glob match and xml parse
-# Example: https://github.com/umbraco/Umbraco-CMS/pull/13787/files
-c_sharp_matches = ["*.csproj"]
 
 # TODO: Gemfile parse
 # Example: https://github.com/mastodon/mastodon/blob/main/Gemfile
@@ -31,18 +32,28 @@ pip_files = []
 # Finds all manifests we can process in the repo 
 # and stores their path in memory
 def walk(path:str="./"):
+    entries=[]
+    mavenWalker.walk(path)
+    entries += mavenWalker.entries
+    
     for p in Path(path).rglob('**/*.*'):
         if p in python_matches:
             pip_files.append(p)
         if p in node_matches:
             node_install_points.append(p)
+    
+    for i in node_install_points:
+        p = parse_node_install_point(i)
+        nodeWalker.walk(p)
+    entries+= nodeWalker.entries
 
 # parse node dependency manifests
 def parse_node_install_point(path:str):
     target_dir = Path(path).parent
     os.chdir(target_dir)
     os.system(node_install)
-    return node_license_walk(path)
+    return target_dir
+    # return node_license_walk(path)
 
 # parse python dependency manifests
 def parse_pip_install_point(path:str):
