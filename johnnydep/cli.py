@@ -101,13 +101,10 @@ def main():
         args.fields = list(FIELDS)
     configure_logging(verbosity=args.verbose)
     if args.node_license_walk:
-        print(args.node_license_walk)
-        node_license_walk(args.node_license_walk[0])
+        node_license_walk(path=args.node_license_walk[0])
     elif args.walk:
         pass
     elif args.requirements:
-        # print("Found args.requirements")
-        # print(args.requirements)
         parseFile(args, filename=args.requirements[0])
         sys.exit(0)
     

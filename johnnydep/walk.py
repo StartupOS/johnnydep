@@ -56,11 +56,10 @@ def node_license_walk(path:str="./node_modules/"):
     license = {}
     res = []
     for p in Path(path).rglob('**/package.json'):
-        # print(p)
         with open(p) as file:
             entry = {}
-            d=json.load(file)
             try:
+                d=json.load(file)
                 key=d["name"] + "@" + d["version"]
                 entry["source"] = "npm"
                 entry["name"] = d["name"]
@@ -84,4 +83,5 @@ def node_license_walk(path:str="./node_modules/"):
             except:
                 pass
             res.append(entry)
+    print(json.dumps(res, indent=4))
     return res
