@@ -90,9 +90,9 @@ def node_license_walk(path:str="./node_modules/"):
 
                 entry["required_by"] = []
                 entry["summary"] = d["description"]
-                
+                res.append(entry)
             except:
                 pass
-            res.append(entry)
+            
     print(json.dumps(res, indent=4))
     return res
